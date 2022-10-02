@@ -30,8 +30,9 @@ def show_all_contacts():
         print(contact.get_all_data())
 
 
-def search_contacts():  # процедура поиска контакта по данным
+def search_contacts():  # метод поиска контакта по данным
     data = input("Введите данные о контакте через пробел: ").split()
+    result = []
 
     for contact in contacts:
         is_right_contact = True  # флаг для проверки контакта на совпадение
@@ -39,7 +40,9 @@ def search_contacts():  # процедура поиска контакта по 
             if data_elem not in contact.get_all_data()[0].split() and data_elem not in contact.get_all_data():  # проверка на совпадение
                 is_right_contact = False
         if is_right_contact:
-            print(contact.get_all_data())
+            result.append(contact)
+
+    return result
 
 
 def show_defective_contacts():
@@ -49,14 +52,15 @@ def show_defective_contacts():
 
 
 def change_contact():  # метод для изменения данных контакта
+    found_contacts = search_contacts()
     print("Выберите контакт по номеру")
     print("0 - отмена")
-    for i in range(len(contacts)):  # выдача номера каждому контакту для удобства использования
-        print(str(i + 1) + " -", contacts[i].get_all_data())
+    for number in range(len(found_contacts)):  # выдача номера каждому контакту для удобства использования
+        print(str(number + 1) + " -", found_contacts[number].get_all_data())
 
     contact_number = int(input("\nВведите номер контакта: "))
 
-    if contact_number < 0 or contact_number >= len(contacts):  # проверка на корректность
+    if contact_number < 0 or contact_number > len(found_contacts):  # проверка на корректность
         print("Такого номера нет\n")
         change_contact()
         return
@@ -66,27 +70,23 @@ def change_contact():  # метод для изменения данных ко�
 
     contact_number -= 1  # возврат к порядку списка
 
-    print("\nПредыдущие данные контакта: ", contacts[contact_number].get_all_data())
+    print("\nПредыдущие данные контакта: ", found_contacts[contact_number].get_all_data())
     print("Ничего не вводите, если хотите оставить данные поля прежними")
 
     name = input("Введите имя: ")
     if name != "":
-        contacts[contact_number].name = name
+        found_contacts[contact_number].name = name
 
     phone_number = input("Введите телефон: ")
     if phone_number != "":
-        contacts[contact_number].phone_number = phone_number
+        found_contacts[contact_number].phone_number = phone_number
 
     email = input("Введите почту: ")
     if email != "":
-        contacts[contact_number].email = email
+        found_contacts[contact_number].email = email
 
-    print("Контакт изменён", contacts[contact_number].get_all_data())
+    print("Контакт изменён", found_contacts[contact_number].get_all_data())
 
-
-print("Все контакты:")
-show_all_contacts()
-print()
 
 while True:  # меню программы
     command = input("Введите команду: ")
@@ -96,7 +96,8 @@ while True:  # меню программы
         show_all_contacts()
 
     elif command == "search":
-        search_contacts()
+        for i in search_contacts():
+            print(i.get_all_data())
 
     elif command == "defective":
         show_defective_contacts()
